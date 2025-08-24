@@ -54,6 +54,16 @@ class Scanner(private val source: String) {
                 string()
             }
 
+            in '0'..'9' -> {
+                number()
+            }
+
+            'o' -> {
+                if (match('r')) {
+                    addToken(TokenType.OR)
+                }
+            }
+
             else -> {
                 Lox.error(line, "Unexpected character '$c'")
             }
@@ -82,6 +92,13 @@ class Scanner(private val source: String) {
         return source[current]
     }
 
+    private fun peekNext(): Char {
+        if (current + 1 > source.length) {
+            return 0x00.toChar()
+        }
+        return source[current + 1]
+    }
+
     private fun string() {
         while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') {
@@ -101,6 +118,27 @@ class Scanner(private val source: String) {
         // Trim the surrounding quotes.
         val value: String = source.substring(start + 1, current - 1)
         addToken(TokenType.STRING, value)
+    }
+
+    private fun isDigit(c: Char): Boolean {
+        return c in '0'..'9'
+    }
+
+    private fun number() {
+        while (isDigit(peek())) {
+            advance()
+        }
+
+        if (peek() == '.' && isDigit(peekNext())) {
+            // Consume the "."
+            advance()
+
+            while (isDigit(peek())) {
+                advance()
+            }
+        }
+
+        addToken(TokenType.NUMBER, source.substring(start, current).toDouble())
     }
 
     private fun addToken(type: TokenType, literal: Any? = null) {
