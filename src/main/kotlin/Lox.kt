@@ -6,6 +6,10 @@ import kotlin.io.path.Path
 import kotlin.system.exitProcess
 
 object Lox {
+    private var hadError = false
+
+    private val logger = Logger()
+
     fun main(args: Array<String>) {
         if (args.size > 1) {
             println("Usage: klox [script]")
@@ -36,6 +40,16 @@ object Lox {
         }
     }
 
-    private fun run(script: String) {
+    private fun run(source: String) {
+//        val scanner = Scanner(source)
+//        val tokens = scanner.scanTokens()
+//        for (token in tokens) {
+//            println(token)
+//        }
+    }
+
+    fun error(line: Int, message: String) {
+        hadError = true
+        logger.error(line, message)
     }
 }
