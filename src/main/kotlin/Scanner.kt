@@ -17,7 +17,6 @@ class Scanner(private val source: String) {
 
     private fun scanToken() {
         val c = advance()
-
         when (c) {
             '(' -> addToken(TokenType.LEFT_PAREN)
             ')' -> addToken(TokenType.RIGHT_PAREN)
@@ -29,11 +28,29 @@ class Scanner(private val source: String) {
             '+' -> addToken(TokenType.PLUS)
             ';' -> addToken(TokenType.SEMICOLON)
             '*' -> addToken(TokenType.STAR)
+            '!' -> addToken(if (match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
+            '=' -> addToken(if (match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
+            '<' -> addToken(if (match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
+            '>' -> addToken(if (match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
+            else -> {
+                Lox.error(line, "Unexpected character '$c'")
+            }
         }
     }
 
     private fun advance(): Char {
         return source[current++]
+    }
+
+    private fun match(expected: Char): Boolean {
+        if (isAtEnd()) {
+            return false
+        }
+        if (source[current] != expected) {
+            return false
+        }
+        current++
+        return true
     }
 
     private fun addToken(type: TokenType, literal: Any? = null) {
