@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.2.0"
+    id("com.diffplug.spotless") version "7.2.1"
 }
 
 group = "org.example"
@@ -18,4 +19,11 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(23)
+}
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint("0.48.2")
+    }
 }

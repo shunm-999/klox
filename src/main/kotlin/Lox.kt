@@ -37,6 +37,5 @@ object Lox {
     }
 
     private fun run(script: String) {
-
     }
 }
