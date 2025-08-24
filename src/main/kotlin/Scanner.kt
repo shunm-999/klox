@@ -28,10 +28,32 @@ class Scanner(private val source: String) {
             '+' -> addToken(TokenType.PLUS)
             ';' -> addToken(TokenType.SEMICOLON)
             '*' -> addToken(TokenType.STAR)
+            '/' -> {
+                if (match('/')) {
+                    while (peek() != '\n' && !isAtEnd()) {
+                        advance()
+                    }
+                } else {
+                    addToken(TokenType.SLASH)
+                }
+            }
+
             '!' -> addToken(if (match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
             '=' -> addToken(if (match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
             '<' -> addToken(if (match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             '>' -> addToken(if (match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
+            ' ', '\r', '\t' -> {
+                // do nothing
+            }
+
+            '\n' -> {
+                line++
+            }
+
+            '"' -> {
+                string()
+            }
+
             else -> {
                 Lox.error(line, "Unexpected character '$c'")
             }
@@ -51,6 +73,34 @@ class Scanner(private val source: String) {
         }
         current++
         return true
+    }
+
+    private fun peek(): Char {
+        if (isAtEnd()) {
+            return 0x00.toChar()
+        }
+        return source[current]
+    }
+
+    private fun string() {
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n') {
+                line++
+            }
+            advance()
+        }
+
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string")
+            return
+        }
+
+        // The closing ".
+        advance()
+
+        // Trim the surrounding quotes.
+        val value: String = source.substring(start + 1, current - 1)
+        addToken(TokenType.STRING, value)
     }
 
     private fun addToken(type: TokenType, literal: Any? = null) {
