@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "2.2.0"
     id("com.diffplug.spotless") version "7.2.1"
@@ -26,6 +28,11 @@ spotless {
         target("**/*.kt")
         ktlint("0.48.2")
     }
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+    freeCompilerArgs.set(listOf("-Xcontext-parameters"))
 }
 
 tasks.register<JavaExec>("generateAst") {
