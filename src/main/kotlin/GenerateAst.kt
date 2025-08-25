@@ -39,7 +39,7 @@ object GenerateAst {
                 listOf(
                     "Binary   : val left: Expr, val operator: Token, val right: Expr",
                     "Grouping : val expression: Expr",
-                    "Literal  : val value: Object",
+                    "Literal  : val value: Any?",
                     "Unary    : val operator: Token, val right: Expr"
                 )
             )
@@ -85,7 +85,7 @@ object GenerateAst {
         writer.write("")
 
         withIndent {
-            write("fun <R> accept(visitor: Visitor<R>)")
+            write("fun <R> accept(visitor: Visitor<R>): R")
         }
         writer.write("")
 
@@ -114,9 +114,9 @@ object GenerateAst {
     ) {
         writer.write("data class $className($fields) : $baseName {")
         withIndent {
-            write("override fun <R> accept(visitor: Visitor<R>) {")
+            write("override fun <R> accept(visitor: Visitor<R>): R {")
             withIndent {
-                write("visitor.visit${className}${baseName}(this)")
+                write("return visitor.visit${className}${baseName}(this)")
             }
             write("}")
         }
