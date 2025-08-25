@@ -6,12 +6,30 @@ sealed interface Expr {
         fun visitUnaryExpr(expr: Unary): R
     }
 
-    data class Binary(val left: Expr, val operator: Token, val right: Expr) : Expr
+    fun <R> accept(visitor: Visitor<R>)
 
-    data class Grouping(val expression: Expr) : Expr
+    data class Binary(val left: Expr, val operator: Token, val right: Expr) : Expr {
+        override fun <R> accept(visitor: Visitor<R>) {
+            visitor.visitBinaryExpr(this)
+        }
+    }
 
-    data class Literal(val value: Object) : Expr
+    data class Grouping(val expression: Expr) : Expr {
+        override fun <R> accept(visitor: Visitor<R>) {
+            visitor.visitGroupingExpr(this)
+        }
+    }
 
-    data class Unary(val operator: Token, val right: Expr) : Expr
+    data class Literal(val value: Object) : Expr {
+        override fun <R> accept(visitor: Visitor<R>) {
+            visitor.visitLiteralExpr(this)
+        }
+    }
+
+    data class Unary(val operator: Token, val right: Expr) : Expr {
+        override fun <R> accept(visitor: Visitor<R>) {
+            visitor.visitUnaryExpr(this)
+        }
+    }
 
 }

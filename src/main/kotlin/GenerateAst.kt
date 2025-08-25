@@ -18,7 +18,7 @@ object GenerateAst {
         val indent: String = " ",
         val writer: PrintWriter
     ) {
-        fun println(x: String) {
+        fun write(x: String) {
             writer.print(indent.repeat(level))
             writer.println(x)
         }
@@ -74,7 +74,7 @@ object GenerateAst {
         baseName: String,
         types: List<String>
     ) {
-        writer.println("sealed interface $baseName {")
+        writer.write("sealed interface $baseName {")
 
         withIndent {
             defineVisitor(
@@ -82,7 +82,12 @@ object GenerateAst {
                 types = types,
             )
         }
-        writer.println("")
+        writer.write("")
+
+        withIndent {
+            write("fun <R> accept(visitor: Visitor<R>)")
+        }
+        writer.write("")
 
         for (type in types) {
             val className = type.split(":", limit = 2)[0].trim()
@@ -95,10 +100,10 @@ object GenerateAst {
                     fields = fields,
                 )
             }
-            writer.println("")
+            writer.write("")
         }
 
-        writer.println("}")
+        writer.write("}")
     }
 
     context(writer: IndentableWriter)
@@ -107,7 +112,15 @@ object GenerateAst {
         className: String,
         fields: String
     ) {
-        writer.println("data class $className($fields) : $baseName")
+        writer.write("data class $className($fields) : $baseName {")
+        withIndent {
+            write("override fun <R> accept(visitor: Visitor<R>) {")
+            withIndent {
+                write("visitor.visit${className}${baseName}(this)")
+            }
+            write("}")
+        }
+        writer.write("}")
     }
 
     context(writer: IndentableWriter)
@@ -115,13 +128,13 @@ object GenerateAst {
         baseName: String,
         types: List<String>
     ) {
-        writer.println("interface Visitor<R> {")
+        writer.write("interface Visitor<R> {")
         for (type in types) {
             val typeName = type.split(":", limit = 2)[0].trim()
             withIndent {
-                this@withIndent.println("fun visit${typeName}${baseName}(${baseName.lowercase()}: ${typeName}): R")
+                write("fun visit${typeName}${baseName}(${baseName.lowercase()}: ${typeName}): R")
             }
         }
-        writer.println("}")
+        writer.write("}")
     }
 }
