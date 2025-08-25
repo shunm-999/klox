@@ -54,18 +54,20 @@ class Scanner(private val source: String) {
                 string()
             }
 
-            in '0'..'9' -> {
-                number()
-            }
-
-            'o' -> {
-                if (match('r')) {
-                    addToken(TokenType.OR)
-                }
-            }
-
             else -> {
-                Lox.error(line, "Unexpected character '$c'")
+                when {
+                    isDigit(c) -> {
+                        number()
+                    }
+
+                    isAlpha(c) -> {
+                        identifier()
+                    }
+
+                    else -> {
+                        Lox.error(line, "Unexpected character '$c'")
+                    }
+                }
             }
         }
     }
@@ -99,6 +101,35 @@ class Scanner(private val source: String) {
         return source[current + 1]
     }
 
+    private fun isDigit(c: Char): Boolean {
+        return c in '0'..'9'
+    }
+
+    private fun isAlpha(c: Char): Boolean {
+        return c in 'a'..'z' || c in 'A'..'Z' || c == '_'
+    }
+
+    private fun isAlphaOrNumeric(c: Char): Boolean {
+        return isAlpha(c) || isDigit(c)
+    }
+
+    private fun number() {
+        while (isDigit(peek())) {
+            advance()
+        }
+
+        if (peek() == '.' && isDigit(peekNext())) {
+            // Consume the "."
+            advance()
+
+            while (isDigit(peek())) {
+                advance()
+            }
+        }
+
+        addToken(TokenType.NUMBER, source.substring(start, current).toDouble())
+    }
+
     private fun string() {
         while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') {
@@ -120,25 +151,15 @@ class Scanner(private val source: String) {
         addToken(TokenType.STRING, value)
     }
 
-    private fun isDigit(c: Char): Boolean {
-        return c in '0'..'9'
-    }
-
-    private fun number() {
-        while (isDigit(peek())) {
+    private fun identifier() {
+        while (isAlphaOrNumeric(peek())) {
             advance()
         }
 
-        if (peek() == '.' && isDigit(peekNext())) {
-            // Consume the "."
-            advance()
+        val text = source.substring(start, current)
+        val type = ReservedKeywords.getTokenType(text) ?: TokenType.IDENTIFIER
 
-            while (isDigit(peek())) {
-                advance()
-            }
-        }
-
-        addToken(TokenType.NUMBER, source.substring(start, current).toDouble())
+        addToken(type)
     }
 
     private fun addToken(type: TokenType, literal: Any? = null) {
