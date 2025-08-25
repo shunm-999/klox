@@ -76,6 +76,14 @@ object GenerateAst {
     ) {
         writer.println("sealed interface $baseName {")
 
+        withIndent {
+            defineVisitor(
+                baseName = baseName,
+                types = types,
+            )
+        }
+        writer.println("")
+
         for (type in types) {
             val className = type.split(":", limit = 2)[0].trim()
             val fields = type.split(":", limit = 2)[1].trim()
@@ -100,5 +108,20 @@ object GenerateAst {
         fields: String
     ) {
         writer.println("data class $className($fields) : $baseName")
+    }
+
+    context(writer: IndentableWriter)
+    private fun defineVisitor(
+        baseName: String,
+        types: List<String>
+    ) {
+        writer.println("interface Visitor<R> {")
+        for (type in types) {
+            val typeName = type.split(":", limit = 2)[0].trim()
+            withIndent {
+                this@withIndent.println("fun visit${typeName}${baseName}(${baseName.lowercase()}: ${typeName}): R")
+            }
+        }
+        writer.println("}")
     }
 }
