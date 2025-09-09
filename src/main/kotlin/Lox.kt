@@ -41,15 +41,28 @@ object Lox {
     }
 
     private fun run(source: String) {
-//        val scanner = Scanner(source)
-//        val tokens = scanner.scanTokens()
-//        for (token in tokens) {
-//            println(token)
-//        }
+        val scanner = Scanner(source)
+        val tokens = scanner.scanTokens()
+
+        val parser = Parser(tokens)
+        val expression = parser.parse() ?: return
+
+        if (hadError) {
+            return
+        }
+        println(AstPrinter().print(expression))
     }
 
     fun error(line: Int, message: String) {
         hadError = true
         logger.error(line, message)
+    }
+
+    fun error(token: Token, message: String) {
+        if (token.type == TokenType.EOF) {
+            logger.error(token.line, message)
+        } else {
+            logger.error(token.line, " at ${token.lexeme}", message)
+        }
     }
 }

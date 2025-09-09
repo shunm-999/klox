@@ -1,9 +1,9 @@
 class Logger {
     fun error(line: Int, message: String) {
-        report(line, "", message)
+        error(line, "", message)
     }
 
-    private fun report(line: Int, where: String, message: String) {
+    fun error(line: Int, where: String, message: String) {
         println("[line $line] $where: $message")
     }
 }

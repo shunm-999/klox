@@ -1,8 +1,16 @@
+import java.text.ParseException
+
 class Parser(
     private val tokens: List<Token>
 ) {
 
     private var current = 0
+
+    fun parse(): Expr? = try {
+        expression()
+    } catch (_: ParseException) {
+        null
+    }
 
     private fun expression(): Expr {
         return equality()
@@ -112,6 +120,8 @@ class Parser(
             consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return Expr.Grouping(expr)
         }
+
+        throw error(peek(), "Expect expression.")
     }
 
     private fun match(vararg tokenTypes: TokenType): Boolean {
@@ -151,7 +161,40 @@ class Parser(
         return tokens[current]
     }
 
-    private fun consume(type: TokenType, errorMessage: String): Boolean {
-        TODO()
+    private fun consume(type: TokenType, errorMessage: String): Token {
+        if (check(type)) {
+            return advance()
+        }
+        throw error(peek(), errorMessage)
+    }
+
+    private fun error(token: Token, errorMessage: String): ParseException {
+        Lox.error(token, errorMessage)
+        return ParseException(errorMessage, token.line)
+    }
+
+    private fun synchronize() {
+        advance()
+
+        while (!isAtEnd()) {
+            if (previous().type == TokenType.SEMICOLON) {
+                return
+            }
+            if (peek().type in listOf(
+                    TokenType.CLASS,
+                    TokenType.FUN,
+                    TokenType.VAR,
+                    TokenType.FOR,
+                    TokenType.IF,
+                    TokenType.WHILE,
+                    TokenType.PRINT,
+                    TokenType.RETURN,
+                )
+            ) {
+                return
+            }
+
+            advance()
+        }
     }
 }
