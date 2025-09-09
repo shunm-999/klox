@@ -80,7 +80,38 @@ class Parser(
     }
 
     private fun unary(): Expr {
-        TODO()
+        if (match(TokenType.BANG, TokenType.MINUS)) {
+            val operator = previous()
+            val right: Expr = unary()
+            return Expr.Unary(
+                operator = operator,
+                right = right
+            )
+        }
+
+        return primary()
+    }
+
+    private fun primary(): Expr {
+        if (match(TokenType.FALSE)) {
+            return Expr.Literal(false)
+        }
+        if (match(TokenType.TRUE)) {
+            return Expr.Literal(true)
+        }
+        if (match(TokenType.NIL)) {
+            return Expr.Literal(null)
+        }
+
+        if (match(TokenType.NUMBER, TokenType.STRING)) {
+            return Expr.Literal(previous().literal)
+        }
+
+        if (match(TokenType.LEFT_PAREN)) {
+            val expr: Expr = expression()
+            consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+            return Expr.Grouping(expr)
+        }
     }
 
     private fun match(vararg tokenTypes: TokenType): Boolean {
@@ -118,5 +149,9 @@ class Parser(
 
     private fun peek(): Token {
         return tokens[current]
+    }
+
+    private fun consume(type: TokenType, errorMessage: String): Boolean {
+        TODO()
     }
 }
