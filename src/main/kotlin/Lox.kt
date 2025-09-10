@@ -7,8 +7,11 @@ import kotlin.system.exitProcess
 
 object Lox {
     private var hadError = false
+    private var hadRuntimeError = false
 
     private val logger = Logger()
+
+    private val interpretor = Interpretor()
 
     fun main(args: Array<String>) {
         if (args.size > 1) {
@@ -23,6 +26,12 @@ object Lox {
 
     private fun runFile(path: String) {
         val bytes: ByteArray = Files.readAllBytes(Path(path))
+        if (hadError) {
+            exitProcess(65)
+        }
+        if (hadRuntimeError) {
+            exitProcess(70)
+        }
         run(String(bytes, Charset.defaultCharset()))
     }
 
@@ -50,7 +59,7 @@ object Lox {
         if (hadError) {
             return
         }
-        println(AstPrinter().print(expression))
+        interpretor.interpret(expression)
     }
 
     fun error(line: Int, message: String) {
@@ -64,5 +73,10 @@ object Lox {
         } else {
             logger.error(token.line, " at ${token.lexeme}", message)
         }
+    }
+
+    fun runtimeError(error: RuntimeError) {
+        println("${error.message}\n[line ${error.token.line}]")
+        hadRuntimeError = true;
     }
 }

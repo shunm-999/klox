@@ -1,4 +1,31 @@
 class Interpretor : Expr.Visitor<Any?> {
+
+    fun interpret(expr: Expr) {
+        try {
+            val value = evaluate(expr)
+            println(stringify(value))
+        } catch (e: RuntimeError) {
+            Lox.runtimeError(e)
+        }
+    }
+
+    private fun stringify(value: Any?): String {
+        if (value == null) {
+            return "nil"
+        }
+
+        if (value is Double) {
+            val text = value.toString()
+            return if (text.endsWith(".0")) {
+                text.dropLast(2)
+            } else {
+                text
+            }
+        }
+
+        return value.toString()
+    }
+
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
         val left = evaluate(expr.left)
         val right = evaluate(expr.right)
@@ -133,6 +160,6 @@ class Interpretor : Expr.Visitor<Any?> {
 
 
 data class RuntimeError(
-    private val token: Token,
+    val token: Token,
     override val message: String,
 ) : RuntimeException()
