@@ -1,5 +1,6 @@
-class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
-
+class Interpretor :
+    Expr.Visitor<Any?>,
+    Stmt.Visitor<Unit> {
     fun interpret(statements: List<Stmt>) {
         try {
             for (statement in statements) {
@@ -94,13 +95,9 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         }
     }
 
-    override fun visitGroupingExpr(expr: Expr.Grouping): Any? {
-        return evaluate(expr.expression)
-    }
+    override fun visitGroupingExpr(expr: Expr.Grouping): Any? = evaluate(expr.expression)
 
-    override fun visitLiteralExpr(expr: Expr.Literal): Any? {
-        return expr.value
-    }
+    override fun visitLiteralExpr(expr: Expr.Literal): Any? = expr.value
 
     override fun visitUnaryExpr(expr: Expr.Unary): Any? {
         val right = evaluate(expr.right)
@@ -138,9 +135,7 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         TODO("Not yet implemented")
     }
 
-    private fun evaluate(expr: Expr): Any? {
-        return expr.accept(this)
-    }
+    private fun evaluate(expr: Expr): Any? = expr.accept(this)
 
     private fun execute(statement: Stmt) {
         statement.accept(this)
@@ -156,7 +151,10 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         return true
     }
 
-    private fun isEqual(a: Any?, b: Any?): Boolean {
+    private fun isEqual(
+        a: Any?,
+        b: Any?,
+    ): Boolean {
         if (a == null && b == null) {
             return true
         }
@@ -166,7 +164,11 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         return a == b
     }
 
-    private fun checkNumberOperands(operator: Token, left: Any?, right: Any?) {
+    private fun checkNumberOperands(
+        operator: Token,
+        left: Any?,
+        right: Any?,
+    ) {
         if (left is Double && right is Double) {
             return
         }

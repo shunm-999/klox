@@ -27,7 +27,8 @@ kotlin {
 spotless {
     kotlin {
         target("**/*.kt")
-        ktlint("0.48.2")
+        targetExclude("**/TokenType.kt")
+        ktlint("1.7.1")
     }
 }
 

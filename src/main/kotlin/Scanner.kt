@@ -1,4 +1,6 @@
-class Scanner(private val source: String) {
+class Scanner(
+    private val source: String,
+) {
     private var start: Int = 0
     private var current: Int = 0
     private var line: Int = 1
@@ -72,9 +74,7 @@ class Scanner(private val source: String) {
         }
     }
 
-    private fun advance(): Char {
-        return source[current++]
-    }
+    private fun advance(): Char = source[current++]
 
     private fun match(expected: Char): Boolean {
         if (isAtEnd()) {
@@ -101,17 +101,11 @@ class Scanner(private val source: String) {
         return source[current + 1]
     }
 
-    private fun isDigit(c: Char): Boolean {
-        return c in '0'..'9'
-    }
+    private fun isDigit(c: Char): Boolean = c in '0'..'9'
 
-    private fun isAlpha(c: Char): Boolean {
-        return c in 'a'..'z' || c in 'A'..'Z' || c == '_'
-    }
+    private fun isAlpha(c: Char): Boolean = c in 'a'..'z' || c in 'A'..'Z' || c == '_'
 
-    private fun isAlphaOrNumeric(c: Char): Boolean {
-        return isAlpha(c) || isDigit(c)
-    }
+    private fun isAlphaOrNumeric(c: Char): Boolean = isAlpha(c) || isDigit(c)
 
     private fun number() {
         while (isDigit(peek())) {
@@ -162,18 +156,20 @@ class Scanner(private val source: String) {
         addToken(type)
     }
 
-    private fun addToken(type: TokenType, literal: Any? = null) {
+    private fun addToken(
+        type: TokenType,
+        literal: Any? = null,
+    ) {
         val text = source.substring(start, current)
-        val token = Token(
-            type = type,
-            lexeme = text,
-            literal = literal,
-            line = line,
-        )
+        val token =
+            Token(
+                type = type,
+                lexeme = text,
+                literal = literal,
+                line = line,
+            )
         tokens.add(token)
     }
 
-    private fun isAtEnd(): Boolean {
-        return current >= source.length
-    }
+    private fun isAtEnd(): Boolean = current >= source.length
 }

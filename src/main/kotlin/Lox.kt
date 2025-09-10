@@ -62,12 +62,18 @@ object Lox {
         interpretor.interpret(statements)
     }
 
-    fun error(line: Int, message: String) {
+    fun error(
+        line: Int,
+        message: String,
+    ) {
         hadError = true
         logger.error(line, message)
     }
 
-    fun error(token: Token, message: String) {
+    fun error(
+        token: Token,
+        message: String,
+    ) {
         if (token.type == TokenType.EOF) {
             logger.error(token.line, message)
         } else {

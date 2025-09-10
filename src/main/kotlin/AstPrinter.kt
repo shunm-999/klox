@@ -1,28 +1,18 @@
 class AstPrinter : Expr.Visitor<String> {
+    fun print(expr: Expr): String = expr.accept(this)
 
-    fun print(expr: Expr): String {
-        return expr.accept(this)
-    }
+    override fun visitBinaryExpr(expr: Expr.Binary): String = parenthesize(expr.operator.lexeme, expr.left, expr.right)
 
-    override fun visitBinaryExpr(expr: Expr.Binary): String {
-        return parenthesize(expr.operator.lexeme, expr.left, expr.right)
-    }
+    override fun visitGroupingExpr(expr: Expr.Grouping): String = parenthesize("group", expr.expression)
 
-    override fun visitGroupingExpr(expr: Expr.Grouping): String {
-        return parenthesize("group", expr.expression)
-    }
-
-    override fun visitLiteralExpr(expr: Expr.Literal): String {
-        return if (expr.value == null) {
+    override fun visitLiteralExpr(expr: Expr.Literal): String =
+        if (expr.value == null) {
             "nil"
         } else {
             expr.value.toString()
         }
-    }
 
-    override fun visitUnaryExpr(expr: Expr.Unary): String {
-        return parenthesize(expr.operator.lexeme, expr.right)
-    }
+    override fun visitUnaryExpr(expr: Expr.Unary): String = parenthesize(expr.operator.lexeme, expr.right)
 
     override fun visitVariableExpr(expr: Expr.Variable): String {
         TODO("Not yet implemented")
@@ -31,12 +21,13 @@ class AstPrinter : Expr.Visitor<String> {
     private fun parenthesize(
         name: String,
         vararg exprs: Expr,
-    ): String = buildString {
-        append("($name")
-        for (expr in exprs) {
-            append(" ")
-            append(expr.accept(this@AstPrinter))
+    ): String =
+        buildString {
+            append("($name")
+            for (expr in exprs) {
+                append(" ")
+                append(expr.accept(this@AstPrinter))
+            }
+            append(")")
         }
-        append(")")
-    }
 }

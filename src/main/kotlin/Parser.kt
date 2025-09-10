@@ -3,7 +3,6 @@ import java.text.ParseException
 class Parser(
     private val tokens: List<Token>,
 ) {
-
     private var current = 0
 
 //    fun parse(): Expr? = try {
@@ -42,11 +41,12 @@ class Parser(
     private fun varDeclaration(): Stmt {
         val name: Token = consume(TokenType.IDENTIFIER, "Expect variable name.")
 
-        val initializer: Expr = if (match(TokenType.EQUAL)) {
-            expression()
-        } else {
-            throw ParseException("Expect variable name expected.", name.line)
-        }
+        val initializer: Expr =
+            if (match(TokenType.EQUAL)) {
+                expression()
+            } else {
+                throw ParseException("Expect variable name expected.", name.line)
+            }
         consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Var(name, initializer)
     }
@@ -63,9 +63,7 @@ class Parser(
         return Stmt.Expression(value)
     }
 
-    private fun expression(): Expr {
-        return equality()
-    }
+    private fun expression(): Expr = equality()
 
     private fun equality(): Expr {
         var expr: Expr = comparison()
@@ -73,11 +71,12 @@ class Parser(
         while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
             val operator = previous()
             val right: Expr = comparison()
-            expr = Expr.Binary(
-                left = expr,
-                operator = operator,
-                right = right,
-            )
+            expr =
+                Expr.Binary(
+                    left = expr,
+                    operator = operator,
+                    right = right,
+                )
         }
 
         return expr
@@ -96,11 +95,12 @@ class Parser(
         ) {
             val operator = previous()
             val right: Expr = term()
-            expr = Expr.Binary(
-                left = expr,
-                operator = operator,
-                right = right,
-            )
+            expr =
+                Expr.Binary(
+                    left = expr,
+                    operator = operator,
+                    right = right,
+                )
         }
 
         return expr
@@ -112,11 +112,12 @@ class Parser(
         while (match(TokenType.MINUS, TokenType.PLUS)) {
             val operator = previous()
             val right: Expr = factor()
-            expr = Expr.Binary(
-                left = expr,
-                operator = operator,
-                right = right,
-            )
+            expr =
+                Expr.Binary(
+                    left = expr,
+                    operator = operator,
+                    right = right,
+                )
         }
 
         return expr
@@ -128,11 +129,12 @@ class Parser(
         while (match(TokenType.SLASH, TokenType.STAR)) {
             val operator = previous()
             val right: Expr = unary()
-            expr = Expr.Binary(
-                left = expr,
-                operator = operator,
-                right = right,
-            )
+            expr =
+                Expr.Binary(
+                    left = expr,
+                    operator = operator,
+                    right = right,
+                )
         }
 
         return expr
@@ -190,9 +192,7 @@ class Parser(
         return false
     }
 
-    private fun isAtEnd(): Boolean {
-        return peek().type == TokenType.EOF
-    }
+    private fun isAtEnd(): Boolean = peek().type == TokenType.EOF
 
     private fun check(tokenType: TokenType): Boolean {
         if (isAtEnd()) {
@@ -201,9 +201,7 @@ class Parser(
         return peek().type == tokenType
     }
 
-    private fun previous(): Token {
-        return tokens[current - 1]
-    }
+    private fun previous(): Token = tokens[current - 1]
 
     private fun advance(): Token {
         if (!isAtEnd()) {
@@ -212,18 +210,22 @@ class Parser(
         return previous()
     }
 
-    private fun peek(): Token {
-        return tokens[current]
-    }
+    private fun peek(): Token = tokens[current]
 
-    private fun consume(type: TokenType, errorMessage: String): Token {
+    private fun consume(
+        type: TokenType,
+        errorMessage: String,
+    ): Token {
         if (check(type)) {
             return advance()
         }
         throw error(peek(), errorMessage)
     }
 
-    private fun error(token: Token, errorMessage: String): ParseException {
+    private fun error(
+        token: Token,
+        errorMessage: String,
+    ): ParseException {
         Lox.error(token, errorMessage)
         return ParseException(errorMessage, token.line)
     }
@@ -235,7 +237,8 @@ class Parser(
             if (previous().type == TokenType.SEMICOLON) {
                 return
             }
-            if (peek().type in listOf(
+            if (peek().type in
+                listOf(
                     TokenType.CLASS,
                     TokenType.FUN,
                     TokenType.VAR,

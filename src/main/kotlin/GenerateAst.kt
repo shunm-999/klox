@@ -3,12 +3,12 @@ import java.nio.file.Paths
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-
-    val path = if (args.isEmpty()) {
-        Paths.get("").toAbsolutePath().toString()
-    } else {
-        args[0]
-    }
+    val path =
+        if (args.isEmpty()) {
+            Paths.get("").toAbsolutePath().toString()
+        } else {
+            args[0]
+        }
     GenerateAst.generate(arrayOf(path))
 }
 
@@ -16,7 +16,7 @@ object GenerateAst {
     internal data class IndentableWriter(
         val level: Int = 0,
         val indent: String = " ",
-        val writer: PrintWriter
+        val writer: PrintWriter,
     ) {
         fun write(x: String) {
             writer.print(indent.repeat(level))
@@ -42,46 +42,48 @@ object GenerateAst {
                     "Literal  : val value: Any?",
                     "Unary    : val operator: Token, val right: Expr",
                     "Variable : val name: Token",
-                )
+                ),
             )
             defineAst(
                 "Stmt",
                 listOf(
                     "Expression : val expression: Expr",
                     "Print : val expression: Expr",
-                    "Var: val token: Token, val initializer: Expr"
-                )
+                    "Var: val token: Token, val initializer: Expr",
+                ),
             )
         }
     }
 
     private fun define(
         path: String,
-        action: IndentableWriter.() -> Unit
+        action: IndentableWriter.() -> Unit,
     ) {
         PrintWriter(path, "UTF-8").use { writer ->
-            val scope = IndentableWriter(
-                level = 0,
-                writer = writer,
-            )
+            val scope =
+                IndentableWriter(
+                    level = 0,
+                    writer = writer,
+                )
             scope.action()
         }
     }
 
     context(writer: IndentableWriter)
     private fun withIndent(action: IndentableWriter.() -> Unit) {
-        val newWriter = IndentableWriter(
-            level = writer.level + 4,
-            writer = writer.writer,
-            indent = writer.indent,
-        )
+        val newWriter =
+            IndentableWriter(
+                level = writer.level + 4,
+                writer = writer.writer,
+                indent = writer.indent,
+            )
         newWriter.action()
     }
 
     context(writer: IndentableWriter)
     private fun defineAst(
         baseName: String,
-        types: List<String>
+        types: List<String>,
     ) {
         writer.write("sealed interface $baseName {")
 
@@ -119,13 +121,13 @@ object GenerateAst {
     private fun defineType(
         baseName: String,
         className: String,
-        fields: String
+        fields: String,
     ) {
         writer.write("data class $className($fields) : $baseName {")
         withIndent {
             write("override fun <R> accept(visitor: Visitor<R>): R {")
             withIndent {
-                write("return visitor.visit${className}${baseName}(this)")
+                write("return visitor.visit${className}$baseName(this)")
             }
             write("}")
         }
@@ -135,13 +137,13 @@ object GenerateAst {
     context(writer: IndentableWriter)
     private fun defineVisitor(
         baseName: String,
-        types: List<String>
+        types: List<String>,
     ) {
         writer.write("interface Visitor<R> {")
         for (type in types) {
             val typeName = type.split(":", limit = 2)[0].trim()
             withIndent {
-                write("fun visit${typeName}${baseName}(${baseName.lowercase()}: ${typeName}): R")
+                write("fun visit${typeName}$baseName(${baseName.lowercase()}: $typeName): R")
             }
         }
         writer.write("}")
