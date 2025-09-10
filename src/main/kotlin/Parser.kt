@@ -5,12 +5,6 @@ class Parser(
 ) {
     private var current = 0
 
-//    fun parse(): Expr? = try {
-//        expression()
-//    } catch (_: ParseException) {
-//        null
-//    }
-
     fun parse(): List<Stmt> {
         val statements = mutableListOf<Stmt?>()
         while (!isAtEnd()) {
@@ -63,7 +57,25 @@ class Parser(
         return Stmt.Expression(value)
     }
 
-    private fun expression(): Expr = equality()
+    private fun expression(): Expr = assignment()
+
+    private fun assignment(): Expr {
+        val expr: Expr = equality()
+
+        if (match(TokenType.EQUAL)) {
+            val equals: Token = previous()
+            val value: Expr = assignment()
+
+            if (expr is Expr.Variable) {
+                val name: Token = expr.name
+                return Expr.Assign(name, value)
+            }
+
+            error(equals, "Invalid assignment in expression.")
+        }
+
+        return expr
+    }
 
     private fun equality(): Expr {
         var expr: Expr = comparison()
