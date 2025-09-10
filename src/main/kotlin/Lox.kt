@@ -77,6 +77,6 @@ object Lox {
 
     fun runtimeError(error: RuntimeError) {
         println("${error.message}\n[line ${error.token.line}]")
-        hadRuntimeError = true;
+        hadRuntimeError = true
     }
 }

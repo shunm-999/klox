@@ -40,7 +40,8 @@ object GenerateAst {
                     "Binary   : val left: Expr, val operator: Token, val right: Expr",
                     "Grouping : val expression: Expr",
                     "Literal  : val value: Any?",
-                    "Unary    : val operator: Token, val right: Expr"
+                    "Unary    : val operator: Token, val right: Expr",
+                    "Variable : val name: Token",
                 )
             )
             defineAst(
@@ -48,6 +49,7 @@ object GenerateAst {
                 listOf(
                     "Expression : val expression: Expr",
                     "Print : val expression: Expr",
+                    "Var: val token: Token, val initializer: Expr"
                 )
             )
         }
@@ -71,7 +73,7 @@ object GenerateAst {
         val newWriter = IndentableWriter(
             level = writer.level + 4,
             writer = writer.writer,
-            indent = writer.indent
+            indent = writer.indent,
         )
         newWriter.action()
     }

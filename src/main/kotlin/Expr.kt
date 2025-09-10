@@ -4,6 +4,7 @@ sealed interface Expr {
         fun visitGroupingExpr(expr: Grouping): R
         fun visitLiteralExpr(expr: Literal): R
         fun visitUnaryExpr(expr: Unary): R
+        fun visitVariableExpr(expr: Variable): R
     }
 
     fun <R> accept(visitor: Visitor<R>): R
@@ -32,11 +33,17 @@ sealed interface Expr {
         }
     }
 
+    data class Variable(val name: Token) : Expr {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitVariableExpr(this)
+        }
+    }
 }
 sealed interface Stmt {
     interface Visitor<R> {
         fun visitExpressionStmt(stmt: Expression): R
         fun visitPrintStmt(stmt: Print): R
+        fun visitVarStmt(stmt: Var): R
     }
 
     fun <R> accept(visitor: Visitor<R>): R
@@ -53,4 +60,9 @@ sealed interface Stmt {
         }
     }
 
+    data class Var(val token: Token, val initializer: Expr) : Stmt {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitVarStmt(this)
+        }
+    }
 }

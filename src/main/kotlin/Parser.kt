@@ -1,7 +1,7 @@
 import java.text.ParseException
 
 class Parser(
-    private val tokens: List<Token>
+    private val tokens: List<Token>,
 ) {
 
     private var current = 0
@@ -52,7 +52,7 @@ class Parser(
             expr = Expr.Binary(
                 left = expr,
                 operator = operator,
-                right = right
+                right = right,
             )
         }
 
@@ -67,7 +67,7 @@ class Parser(
                 TokenType.GREATER,
                 TokenType.GREATER_EQUAL,
                 TokenType.LESS,
-                TokenType.LESS_EQUAL
+                TokenType.LESS_EQUAL,
             )
         ) {
             val operator = previous()
@@ -75,7 +75,7 @@ class Parser(
             expr = Expr.Binary(
                 left = expr,
                 operator = operator,
-                right = right
+                right = right,
             )
         }
 
@@ -91,7 +91,7 @@ class Parser(
             expr = Expr.Binary(
                 left = expr,
                 operator = operator,
-                right = right
+                right = right,
             )
         }
 
@@ -107,7 +107,7 @@ class Parser(
             expr = Expr.Binary(
                 left = expr,
                 operator = operator,
-                right = right
+                right = right,
             )
         }
 
@@ -120,7 +120,7 @@ class Parser(
             val right: Expr = unary()
             return Expr.Unary(
                 operator = operator,
-                right = right
+                right = right,
             )
         }
 

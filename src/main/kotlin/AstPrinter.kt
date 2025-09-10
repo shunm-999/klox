@@ -24,9 +24,13 @@ class AstPrinter : Expr.Visitor<String> {
         return parenthesize(expr.operator.lexeme, expr.right)
     }
 
+    override fun visitVariableExpr(expr: Expr.Variable): String {
+        TODO("Not yet implemented")
+    }
+
     private fun parenthesize(
         name: String,
-        vararg exprs: Expr
+        vararg exprs: Expr,
     ): String = buildString {
         append("($name")
         for (expr in exprs) {

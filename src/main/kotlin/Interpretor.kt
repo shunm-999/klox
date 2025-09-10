@@ -74,7 +74,7 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
                 }
                 throw RuntimeError(
                     expr.operator,
-                    "Operands must be two numbers or two strings."
+                    "Operands must be two numbers or two strings.",
                 )
             }
 
@@ -120,6 +120,9 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         }
     }
 
+    override fun visitVariableExpr(expr: Expr.Variable): Any? {
+        TODO("Not yet implemented")
+    }
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
@@ -129,6 +132,10 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     override fun visitPrintStmt(stmt: Stmt.Print) {
         val value = evaluate(stmt.expression)
         println(stringify(value))
+    }
+
+    override fun visitVarStmt(stmt: Stmt.Var) {
+        TODO("Not yet implemented")
     }
 
     private fun evaluate(expr: Expr): Any? {
@@ -165,9 +172,7 @@ class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
         }
         throw RuntimeError(operator, "Operand must be a number.")
     }
-
 }
-
 
 data class RuntimeError(
     val token: Token,
