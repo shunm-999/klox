@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -35,4 +34,12 @@ spotless {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
     freeCompilerArgs.set(listOf("-Xcontext-parameters"))
+}
+
+tasks.register<JavaExec>("runFile") {
+    group = "run"
+    description = "Run Klox Code in File"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("MainKt")
+    args = listOf("${projectDir}/src/assets/example.lox")
 }

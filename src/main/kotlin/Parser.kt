@@ -67,6 +67,7 @@ class Parser(
                     add(declaration())
                 }
             }
+        consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
         return Stmt.Block(statements.filterNotNull())
     }
 
