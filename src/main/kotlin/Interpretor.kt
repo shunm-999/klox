@@ -13,22 +13,27 @@ class Interpretor : Expr.Visitor<Any?> {
             }
 
             TokenType.GREATER -> {
+                checkNumberOperands(expr.operator, left, right)
                 (left as Double) > (right as Double)
             }
 
             TokenType.GREATER_EQUAL -> {
+                checkNumberOperands(expr.operator, left, right)
                 (left as Double) >= (right as Double)
             }
 
             TokenType.LESS -> {
+                checkNumberOperands(expr.operator, left, right)
                 (left as Double) < (right as Double)
             }
 
             TokenType.LESS_EQUAL -> {
+                checkNumberOperands(expr.operator, left, right)
                 (left as Double) <= (right as Double)
             }
 
             TokenType.MINUS -> {
+                checkNumberOperands(expr.operator, left, right)
                 (left as Double) - (right as Double)
             }
 
@@ -39,14 +44,19 @@ class Interpretor : Expr.Visitor<Any?> {
                 if (left is String && right is String) {
                     left + right
                 }
-                throw IllegalStateException("Unexpected token: $left + $right")
+                throw RuntimeError(
+                    expr.operator,
+                    "Operands must be two numbers or two strings."
+                )
             }
 
             TokenType.SLASH -> {
+                checkNumberOperands(expr.operator, left, right)
                 (left as Double) / (right as Double)
             }
 
             TokenType.STAR -> {
+                checkNumberOperands(expr.operator, left, right)
                 (left as Double) * (right as Double)
             }
 
@@ -105,4 +115,24 @@ class Interpretor : Expr.Visitor<Any?> {
         }
         return a == b
     }
+
+    private fun checkNumberOperand(operator: Token, operand: Any?) {
+        if (operand is Double) {
+            return
+        }
+        throw RuntimeError(operator, "Operand must be a number.")
+    }
+
+    private fun checkNumberOperands(operator: Token, left: Any?, right: Any?) {
+        if (left is Double && right is Double) {
+            return
+        }
+        throw RuntimeError(operator, "Operand must be a number.")
+    }
 }
+
+
+data class RuntimeError(
+    private val token: Token,
+    override val message: String,
+) : RuntimeException()
