@@ -49,7 +49,7 @@ object GenerateAst {
                 listOf(
                     "Expression : val expression: Expr",
                     "Print : val expression: Expr",
-                    "Var: val token: Token, val initializer: Expr",
+                    "Var: val token: Token, val initializer: Expr?",
                 ),
             )
         }

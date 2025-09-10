@@ -1,6 +1,8 @@
 class Interpretor :
     Expr.Visitor<Any?>,
     Stmt.Visitor<Unit> {
+    private val environment = Environment()
+
     fun interpret(statements: List<Stmt>) {
         try {
             for (statement in statements) {
@@ -117,9 +119,7 @@ class Interpretor :
         }
     }
 
-    override fun visitVariableExpr(expr: Expr.Variable): Any? {
-        TODO("Not yet implemented")
-    }
+    override fun visitVariableExpr(expr: Expr.Variable): Any? = environment.get(expr.name)
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
@@ -132,7 +132,14 @@ class Interpretor :
     }
 
     override fun visitVarStmt(stmt: Stmt.Var) {
-        TODO("Not yet implemented")
+        val value: Any? =
+            if (stmt.initializer != null) {
+                evaluate(stmt.initializer)
+            } else {
+                null
+            }
+
+        environment.define(stmt.token.lexeme, value)
     }
 
     private fun evaluate(expr: Expr): Any? = expr.accept(this)

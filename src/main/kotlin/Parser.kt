@@ -41,11 +41,11 @@ class Parser(
     private fun varDeclaration(): Stmt {
         val name: Token = consume(TokenType.IDENTIFIER, "Expect variable name.")
 
-        val initializer: Expr =
+        val initializer: Expr? =
             if (match(TokenType.EQUAL)) {
                 expression()
             } else {
-                throw ParseException("Expect variable name expected.", name.line)
+                null
             }
         consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Var(name, initializer)

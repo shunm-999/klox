@@ -72,7 +72,7 @@ sealed interface Stmt {
 
     data class Var(
         val token: Token,
-        val initializer: Expr,
+        val initializer: Expr?,
     ) : Stmt {
         override fun <R> accept(visitor: Visitor<R>): R = visitor.visitVarStmt(this)
     }
