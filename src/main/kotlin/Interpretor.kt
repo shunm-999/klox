@@ -1,9 +1,10 @@
-class Interpretor : Expr.Visitor<Any?> {
+class Interpretor : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
-    fun interpret(expr: Expr) {
+    fun interpret(statements: List<Stmt>) {
         try {
-            val value = evaluate(expr)
-            println(stringify(value))
+            for (statement in statements) {
+                execute(statement)
+            }
         } catch (e: RuntimeError) {
             Lox.runtimeError(e)
         }
@@ -66,10 +67,10 @@ class Interpretor : Expr.Visitor<Any?> {
 
             TokenType.PLUS -> {
                 if (left is Double && right is Double) {
-                    left + right
+                    return left + right
                 }
                 if (left is String && right is String) {
-                    left + right
+                    return left + right
                 }
                 throw RuntimeError(
                     expr.operator,
@@ -119,8 +120,23 @@ class Interpretor : Expr.Visitor<Any?> {
         }
     }
 
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression) {
+        evaluate(stmt.expression)
+        // TODO
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print) {
+        val value = evaluate(stmt.expression)
+        println(stringify(value))
+    }
+
     private fun evaluate(expr: Expr): Any? {
         return expr.accept(this)
+    }
+
+    private fun execute(statement: Stmt) {
+        statement.accept(this)
     }
 
     private fun isTruthy(target: Any?): Boolean {
@@ -143,19 +159,13 @@ class Interpretor : Expr.Visitor<Any?> {
         return a == b
     }
 
-    private fun checkNumberOperand(operator: Token, operand: Any?) {
-        if (operand is Double) {
-            return
-        }
-        throw RuntimeError(operator, "Operand must be a number.")
-    }
-
     private fun checkNumberOperands(operator: Token, left: Any?, right: Any?) {
         if (left is Double && right is Double) {
             return
         }
         throw RuntimeError(operator, "Operand must be a number.")
     }
+
 }
 
 
