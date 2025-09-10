@@ -1,7 +1,7 @@
 class Interpretor :
     Expr.Visitor<Any?>,
     Stmt.Visitor<Unit> {
-    private val environment = Environment()
+    private var environment = Environment()
 
     fun interpret(statements: List<Stmt>) {
         try {
@@ -127,6 +127,10 @@ class Interpretor :
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? = environment.get(expr.name)
 
+    override fun visitBlockStmt(stmt: Stmt.Block) {
+        executeBlock(stmt.statements, Environment(environment))
+    }
+
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
         // TODO
@@ -152,6 +156,22 @@ class Interpretor :
 
     private fun execute(statement: Stmt) {
         statement.accept(this)
+    }
+
+    private fun executeBlock(
+        statements: List<Stmt>,
+        environment: Environment,
+    ) {
+        val previous = this.environment
+        try {
+            this.environment = environment
+
+            for (statement in statements) {
+                execute(statement)
+            }
+        } finally {
+            this.environment = previous
+        }
     }
 
     private fun isTruthy(target: Any?): Boolean {
