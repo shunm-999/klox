@@ -6,10 +6,37 @@ class Parser(
 
     private var current = 0
 
-    fun parse(): Expr? = try {
-        expression()
-    } catch (_: ParseException) {
-        null
+//    fun parse(): Expr? = try {
+//        expression()
+//    } catch (_: ParseException) {
+//        null
+//    }
+
+    fun parse(): List<Stmt> {
+        val statements = mutableListOf<Stmt>()
+        while (!isAtEnd()) {
+            statements.add(statement())
+        }
+        return statements
+    }
+
+    private fun statement(): Stmt {
+        if (match(TokenType.PRINT)) {
+            return printStatement()
+        }
+        return expressionStatement()
+    }
+
+    private fun printStatement(): Stmt {
+        val value: Expr = expression()
+        consume(TokenType.SEMICOLON, "Expect ';' after expression")
+        return Stmt.Print(value)
+    }
+
+    private fun expressionStatement(): Stmt {
+        val value: Expr = expression()
+        consume(TokenType.SEMICOLON, "Expect ';' after expression")
+        return Stmt.Expression(value)
     }
 
     private fun expression(): Expr {
