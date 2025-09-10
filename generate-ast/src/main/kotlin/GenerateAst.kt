@@ -1,3 +1,5 @@
+package org.example
+
 import java.io.PrintWriter
 import java.nio.file.Paths
 import kotlin.system.exitProcess
@@ -48,9 +50,10 @@ object GenerateAst {
             defineAst(
                 "Stmt",
                 listOf(
+                    "Block      : val statements: List<Stmt>",
                     "Expression : val expression: Expr",
-                    "Print : val expression: Expr",
-                    "Var: val token: Token, val initializer: Expr?",
+                    "Print      : val expression: Expr",
+                    "Var        : val token: Token, val initializer: Expr?",
                 ),
             )
         }

@@ -1,4 +1,6 @@
-class Environment {
+data class Environment(
+    private val enclosing: Environment? = null,
+) {
     private val values: HashMap<String, Any?> = hashMapOf()
 
     fun define(
@@ -14,6 +16,7 @@ class Environment {
     ) {
         if (values.containsKey(name.lexeme)) {
             values[name.lexeme] = value
+            return
         }
 
         throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
@@ -22,6 +25,9 @@ class Environment {
     fun get(name: Token): Any? {
         if (values.containsKey(name.lexeme)) {
             return values[name.lexeme]
+        }
+        if (enclosing != null) {
+            return enclosing.get(name)
         }
 
         throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")

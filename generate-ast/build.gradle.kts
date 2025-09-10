@@ -1,8 +1,7 @@
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm")
     id("com.diffplug.spotless") version "7.2.1"
 }
 
@@ -35,4 +34,12 @@ spotless {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
     freeCompilerArgs.set(listOf("-Xcontext-parameters"))
+}
+
+tasks.register<JavaExec>("generateAst") {
+    group = "codegen"
+    description = "Run GenerateAst to create AST classes"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("org.example.GenerateAstKt")
+    args = listOf("${projectDir.parent}/src/main/kotlin")
 }
