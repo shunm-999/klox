@@ -43,6 +43,13 @@ object GenerateAst {
                     "Unary    : val operator: Token, val right: Expr"
                 )
             )
+            defineAst(
+                "Stmt",
+                listOf(
+                    "Expression : val expression: Expr",
+                    "Print : val expression: Expr",
+                )
+            )
         }
     }
 
