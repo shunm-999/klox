@@ -133,7 +133,14 @@ class Interpretor :
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
-        // TODO
+    }
+
+    override fun visitIfStmt(stmt: Stmt.If) {
+        if (isTruthy(stmt.condition)) {
+            execute(stmt.thenBranch)
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch)
+        }
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print) {

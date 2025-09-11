@@ -26,6 +26,9 @@ class Parser(
     }
 
     private fun statement(): Stmt {
+        if (match(TokenType.IF)) {
+            return ifStatement()
+        }
         if (match(TokenType.PRINT)) {
             return printStatement()
         }
@@ -46,6 +49,26 @@ class Parser(
             }
         consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Var(name, initializer)
+    }
+
+    private fun ifStatement(): Stmt {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        val condition: Expr = expression()
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.")
+
+        val thenBranch: Stmt = statement()
+        val elseBranch: Stmt? =
+            if (match(TokenType.ELSE)) {
+                statement()
+            } else {
+                null
+            }
+
+        return Stmt.If(
+            condition = condition,
+            thenBranch = thenBranch,
+            elseBranch = elseBranch,
+        )
     }
 
     private fun printStatement(): Stmt {
