@@ -175,6 +175,12 @@ class Interpretor :
         environment.define(stmt.token.lexeme, value)
     }
 
+    override fun visitWhileStmt(stmt: Stmt.While) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body)
+        }
+    }
+
     private fun evaluate(expr: Expr): Any? = expr.accept(this)
 
     private fun execute(statement: Stmt) {

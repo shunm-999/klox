@@ -18,8 +18,11 @@ data class Environment(
             values[name.lexeme] = value
             return
         }
-
-        throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
+        if (enclosing != null) {
+            enclosing.assign(name, value)
+        } else {
+            throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
+        }
     }
 
     fun get(name: Token): Any? {

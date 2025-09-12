@@ -56,6 +56,7 @@ object GenerateAst {
                     "If         : val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?",
                     "Print      : val expression: Expr",
                     "Var        : val token: Token, val initializer: Expr?",
+                    "While      : val condition: Expr, val body: Stmt",
                 ),
             )
         }
