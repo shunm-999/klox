@@ -26,6 +26,9 @@ class Parser(
     }
 
     private fun statement(): Stmt {
+        if (match(TokenType.FOR)) {
+            return forStatement()
+        }
         if (match(TokenType.IF)) {
             return ifStatement()
         }
@@ -52,6 +55,58 @@ class Parser(
             }
         consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Stmt.Var(name, initializer)
+    }
+
+    private fun forStatement(): Stmt {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after for.")
+
+        val initializer: Stmt? = if (match(TokenType.SEMICOLON)) {
+            null
+        } else if (match(TokenType.VAR)) {
+            varDeclaration()
+        } else {
+            expressionStatement()
+        }
+
+        var condition: Expr? = if (!check(TokenType.SEMICOLON)) {
+            expression()
+        } else {
+            null
+        }
+        consume(TokenType.SEMICOLON, "Expect ';' loop condition.")
+
+        val increment: Expr? = if (!check(TokenType.RIGHT_PAREN)) {
+            expression()
+        } else {
+            null
+        }
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
+
+        var body = statement()
+
+        if (increment != null) {
+            body = Stmt.Block(
+                listOf(
+                    body,
+                    Stmt.Expression(increment)
+                )
+            )
+        }
+        if (condition == null) {
+            condition = Expr.Literal(condition)
+        }
+        body = Stmt.While(condition, body)
+
+        if (initializer != null) {
+            body = Stmt.Block(
+                listOf(
+                    initializer,
+                    body
+                )
+            )
+        }
+
+        return body
     }
 
     private fun ifStatement(): Stmt {
