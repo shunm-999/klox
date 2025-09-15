@@ -1,7 +1,24 @@
 class Interpreter :
     Expr.Visitor<Any?>,
     Stmt.Visitor<Unit> {
-    private var environment = Environment()
+    private val globals = Environment()
+    private var environment = globals
+
+    init {
+        globals.define(
+            "clock",
+            object : LoxCallable {
+                override fun arity(): Int = 0
+
+                override fun call(
+                    interpreter: Interpreter,
+                    arguments: List<Any?>,
+                ): Any = (System.currentTimeMillis() / 1000.0)
+
+                override fun toString(): String = "<native fn>"
+            },
+        )
+    }
 
     fun interpret(statements: List<Stmt>) {
         try {
@@ -117,8 +134,11 @@ class Interpreter :
             throw RuntimeError(expr.paren, "Can only call functions and class")
         }
 
-        val function: LoxCallable = callee as LoxCallable
-        return function.call(this, arguments)
+        if (arguments.size != callee.arity()) {
+            throw RuntimeError(expr.paren, "Expected ${callee.arity()} arguments but got ${arguments.size}")
+        }
+
+        return callee.call(this, arguments)
     }
 
     override fun visitGroupingExpr(expr: Expr.Grouping): Any? = evaluate(expr.expression)
