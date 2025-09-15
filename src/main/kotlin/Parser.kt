@@ -60,37 +60,41 @@ class Parser(
     private fun forStatement(): Stmt {
         consume(TokenType.LEFT_PAREN, "Expect '(' after for.")
 
-        val initializer: Stmt? = if (match(TokenType.SEMICOLON)) {
-            null
-        } else if (match(TokenType.VAR)) {
-            varDeclaration()
-        } else {
-            expressionStatement()
-        }
+        val initializer: Stmt? =
+            if (match(TokenType.SEMICOLON)) {
+                null
+            } else if (match(TokenType.VAR)) {
+                varDeclaration()
+            } else {
+                expressionStatement()
+            }
 
-        var condition: Expr? = if (!check(TokenType.SEMICOLON)) {
-            expression()
-        } else {
-            null
-        }
+        var condition: Expr? =
+            if (!check(TokenType.SEMICOLON)) {
+                expression()
+            } else {
+                null
+            }
         consume(TokenType.SEMICOLON, "Expect ';' loop condition.")
 
-        val increment: Expr? = if (!check(TokenType.RIGHT_PAREN)) {
-            expression()
-        } else {
-            null
-        }
+        val increment: Expr? =
+            if (!check(TokenType.RIGHT_PAREN)) {
+                expression()
+            } else {
+                null
+            }
         consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.")
 
         var body = statement()
 
         if (increment != null) {
-            body = Stmt.Block(
-                listOf(
-                    body,
-                    Stmt.Expression(increment)
+            body =
+                Stmt.Block(
+                    listOf(
+                        body,
+                        Stmt.Expression(increment),
+                    ),
                 )
-            )
         }
         if (condition == null) {
             condition = Expr.Literal(condition)
@@ -98,12 +102,13 @@ class Parser(
         body = Stmt.While(condition, body)
 
         if (initializer != null) {
-            body = Stmt.Block(
-                listOf(
-                    initializer,
-                    body
+            body =
+                Stmt.Block(
+                    listOf(
+                        initializer,
+                        body,
+                    ),
                 )
-            )
         }
 
         return body
@@ -289,7 +294,21 @@ class Parser(
             )
         }
 
-        return primary()
+        return call()
+    }
+
+    private fun call(): Expr {
+        var expr: Expr = primary()
+
+        while (true) {
+            if (match(TokenType.LEFT_PAREN)) {
+                expr = finishCall(expr)
+            } else {
+                break
+            }
+        }
+
+        return expr
     }
 
     private fun primary(): Expr {
@@ -393,5 +412,26 @@ class Parser(
 
             advance()
         }
+    }
+
+    private fun finishCall(callee: Expr): Expr {
+        val arguments = mutableListOf<Expr>()
+
+        if (!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (arguments.size > 255) {
+                    error(peek(), "Cannot have more than 255 arguments.")
+                }
+                arguments.add(expression())
+            } while (match(TokenType.COMMA))
+        }
+
+        val paren: Token = consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+
+        return Expr.Call(
+            callee = callee,
+            paren = paren,
+            arguments = arguments,
+        )
     }
 }

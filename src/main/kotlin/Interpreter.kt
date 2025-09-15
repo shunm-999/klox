@@ -1,4 +1,4 @@
-class Interpretor :
+class Interpreter :
     Expr.Visitor<Any?>,
     Stmt.Visitor<Unit> {
     private var environment = Environment()
@@ -101,6 +101,24 @@ class Interpretor :
                 throw IllegalStateException("Unexpected operator ${expr.operator}")
             }
         }
+    }
+
+    override fun visitCallExpr(expr: Expr.Call): Any? {
+        val callee: Any? = evaluate(expr.callee)
+
+        val arguments =
+            buildList {
+                for (argument in expr.arguments) {
+                    add(evaluate(argument))
+                }
+            }
+
+        if (callee !is LoxCallable) {
+            throw RuntimeError(expr.paren, "Can only call functions and class")
+        }
+
+        val function: LoxCallable = callee as LoxCallable
+        return function.call(this, arguments)
     }
 
     override fun visitGroupingExpr(expr: Expr.Grouping): Any? = evaluate(expr.expression)

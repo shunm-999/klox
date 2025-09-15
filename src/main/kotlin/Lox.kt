@@ -11,7 +11,7 @@ object Lox {
 
     private val logger = Logger()
 
-    private val interpretor = Interpretor()
+    private val interpreter = Interpreter()
 
     fun main(args: Array<String>) {
         if (args.size > 1) {
@@ -59,7 +59,7 @@ object Lox {
         if (hadError) {
             return
         }
-        interpretor.interpret(statements)
+        interpreter.interpret(statements)
     }
 
     fun error(
