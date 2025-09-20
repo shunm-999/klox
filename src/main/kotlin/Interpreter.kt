@@ -1,7 +1,7 @@
 class Interpreter :
     Expr.Visitor<Any?>,
     Stmt.Visitor<Unit> {
-    private val globals = Environment()
+    val globals = Environment()
     private var environment = globals
 
     init {
@@ -53,7 +53,7 @@ class Interpreter :
         return value
     }
 
-    override fun visitBinaryExpr(expr: Expr.Binary): Any? {
+    override fun visitBinaryExpr(expr: Expr.Binary): Any {
         val left = evaluate(expr.left)
         val right = evaluate(expr.right)
 
@@ -161,7 +161,7 @@ class Interpreter :
         return evaluate(expr.right)
     }
 
-    override fun visitUnaryExpr(expr: Expr.Unary): Any? {
+    override fun visitUnaryExpr(expr: Expr.Unary): Any {
         val right = evaluate(expr.right)
 
         return when (expr.operator.type) {
@@ -187,6 +187,11 @@ class Interpreter :
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
+    }
+
+    override fun visitFunctionStmt(stmt: Stmt.Function) {
+        val loxFunction = LoxFunction(stmt)
+        environment.define(stmt.name.lexeme, loxFunction)
     }
 
     override fun visitIfStmt(stmt: Stmt.If) {
@@ -225,7 +230,7 @@ class Interpreter :
         statement.accept(this)
     }
 
-    private fun executeBlock(
+    fun executeBlock(
         statements: List<Stmt>,
         environment: Environment,
     ) {
