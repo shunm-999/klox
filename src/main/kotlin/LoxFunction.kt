@@ -1,5 +1,6 @@
 class LoxFunction(
     private val declaration: Stmt.Function,
+    private val closure: Environment
 ) : LoxCallable {
     override fun arity(): Int = declaration.params.size
 
@@ -7,7 +8,7 @@ class LoxFunction(
         interpreter: Interpreter,
         arguments: List<Any?>,
     ): Any? {
-        val environment = Environment(interpreter.globals)
+        val environment = Environment(closure)
 
         for ((index, param) in declaration.params.withIndex()) {
             environment.define(param.lexeme, arguments[index])

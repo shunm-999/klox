@@ -190,7 +190,7 @@ class Interpreter :
     }
 
     override fun visitFunctionStmt(stmt: Stmt.Function) {
-        val loxFunction = LoxFunction(stmt)
+        val loxFunction = LoxFunction(stmt, environment)
         environment.define(stmt.name.lexeme, loxFunction)
     }
 
