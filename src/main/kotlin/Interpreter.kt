@@ -207,6 +207,16 @@ class Interpreter :
         println(stringify(value))
     }
 
+    override fun visitReturnStmt(stmt: Stmt.Return) {
+        val value = if (stmt.value == null) {
+            null
+        } else {
+            evaluate(stmt.value)
+        }
+
+        throw Return(value)
+    }
+
     override fun visitVarStmt(stmt: Stmt.Var) {
         val value: Any? =
             if (stmt.initializer != null) {

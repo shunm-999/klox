@@ -12,7 +12,11 @@ class LoxFunction(
         for ((index, param) in declaration.params.withIndex()) {
             environment.define(param.lexeme, arguments[index])
         }
-        interpreter.executeBlock(declaration.body, environment)
+        try {
+            interpreter.executeBlock(declaration.body, environment)
+        } catch (returnValue: Return) {
+            return returnValue.value
+        }
         return null
     }
 
