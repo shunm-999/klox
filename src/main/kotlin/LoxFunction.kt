@@ -1,6 +1,6 @@
 class LoxFunction(
     private val declaration: Stmt.Function,
-    private val closure: Environment
+    private val closure: Environment,
 ) : LoxCallable {
     override fun arity(): Int = declaration.params.size
 

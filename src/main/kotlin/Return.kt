@@ -1,4 +1,3 @@
 class Return(
     val value: Any?,
-) : RuntimeException(null, null, false, false) {
-}
+) : RuntimeException(null, null, false, false)

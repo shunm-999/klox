@@ -174,11 +174,12 @@ class Parser(
     private fun returnStatement(): Stmt {
         val keyword = previous()
 
-        val value: Expr? = if (check(TokenType.SEMICOLON)) {
-            null
-        } else {
-            expression()
-        }
+        val value: Expr? =
+            if (check(TokenType.SEMICOLON)) {
+                null
+            } else {
+                expression()
+            }
 
         consume(TokenType.SEMICOLON, "Expect ';' after expression")
         return Stmt.Return(keyword, value)

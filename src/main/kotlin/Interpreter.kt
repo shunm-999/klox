@@ -208,11 +208,12 @@ class Interpreter :
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) {
-        val value = if (stmt.value == null) {
-            null
-        } else {
-            evaluate(stmt.value)
-        }
+        val value =
+            if (stmt.value == null) {
+                null
+            } else {
+                evaluate(stmt.value)
+            }
 
         throw Return(value)
     }
