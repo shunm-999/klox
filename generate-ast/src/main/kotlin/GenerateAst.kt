@@ -54,6 +54,7 @@ object GenerateAst {
                 listOf(
                     "Block      : val statements: List<Stmt>",
                     "Expression : val expression: Expr",
+                    "Function   : val name: Token, val params: List<Token>, val body: List<Stmt>",
                     "If         : val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?",
                     "Print      : val expression: Expr",
                     "Var        : val token: Token, val initializer: Expr?",
