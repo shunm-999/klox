@@ -25,6 +25,10 @@ data class Environment(
         }
     }
 
+    fun assignAt(distance: Int, name: Token, value: Any?) {
+        ancestor(distance).values[name.lexeme] = value
+    }
+
     fun get(name: Token): Any? {
         if (values.containsKey(name.lexeme)) {
             return values[name.lexeme]
@@ -34,5 +38,15 @@ data class Environment(
         }
 
         throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
+    }
+
+    fun getAt(distance: Int, name: Token): Any? = ancestor(distance).values[name.lexeme]
+
+    fun ancestor(distance: Int): Environment {
+        var environment = this
+        for (i in 0 until distance) {
+            environment = environment.enclosing ?: throw IllegalStateException("No enclosing environment.")
+        }
+        return environment
     }
 }
