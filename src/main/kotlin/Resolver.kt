@@ -4,8 +4,21 @@ class Resolver(
     private val interpreter: Interpreter
 ) : Expr.Visitor<Unit>, Stmt.Visitor<Unit> {
 
+    enum class FunctionType {
+        NONE,
+        FUNCTION,
+        METHOD
+    }
+
+    enum class ClassType {
+        NONE,
+        CLASS
+    }
+
     private val scopes: Stack<HashMap<String, Boolean>> = Stack()
     private var currentFunction: FunctionType = FunctionType.NONE
+
+    private var currentClass: ClassType = ClassType.NONE
 
     override fun visitBlockStmt(stmt: Stmt.Block) {
         beginScope()
@@ -14,12 +27,21 @@ class Resolver(
     }
 
     override fun visitClassStmt(stmt: Stmt.Class) {
+        val enclosingClass = currentClass
+        currentClass = ClassType.CLASS
+
         declare(stmt.name)
         define(stmt.name)
+
+        beginScope()
+        scopes.peek()["this"] = true
 
         for (method in stmt.methods) {
             resolveFunction(method, FunctionType.METHOD)
         }
+        endScope()
+
+        currentClass = enclosingClass
     }
 
     override fun visitVarStmt(stmt: Stmt.Var) {
@@ -119,6 +141,13 @@ class Resolver(
     override fun visitSetExpr(expr: Expr.Set) {
         resolve(expr.value)
         resolve(expr.instance)
+    }
+
+    override fun visitThisExpr(expr: Expr.This) {
+        if (currentClass == ClassType.NONE) {
+            Lox.error(expr.keyword, "Can't 'this' outside of a class.")
+        }
+        resolveLocal(expr, expr.keyword)
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary) {

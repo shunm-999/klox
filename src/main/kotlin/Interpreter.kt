@@ -190,6 +190,10 @@ class Interpreter :
         return value
     }
 
+    override fun visitThisExpr(expr: Expr.This): Any? {
+        return lookUpVariable(expr.keyword, expr)
+    }
+
     override fun visitUnaryExpr(expr: Expr.Unary): Any {
         val right = evaluate(expr.right)
 
@@ -227,7 +231,7 @@ class Interpreter :
     override fun visitClassStmt(stmt: Stmt.Class) {
         environment.define(stmt.name.lexeme, null)
 
-        val methods : Map<String, LoxFunction> =buildMap {
+        val methods: Map<String, LoxFunction> = buildMap {
             for (method in stmt.methods) {
                 val function = LoxFunction(method, environment)
                 put(method.name.lexeme, function)
