@@ -16,6 +16,10 @@ class Resolver(
     override fun visitClassStmt(stmt: Stmt.Class) {
         declare(stmt.name)
         define(stmt.name)
+
+        for (method in stmt.methods) {
+            resolveFunction(method, FunctionType.METHOD)
+        }
     }
 
     override fun visitVarStmt(stmt: Stmt.Var) {
@@ -110,6 +114,11 @@ class Resolver(
     override fun visitLogicalExpr(expr: Expr.Logical) {
         resolve(expr.left)
         resolve(expr.right)
+    }
+
+    override fun visitSetExpr(expr: Expr.Set) {
+        resolve(expr.value)
+        resolve(expr.instance)
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary) {

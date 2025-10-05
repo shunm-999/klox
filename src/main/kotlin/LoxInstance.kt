@@ -2,13 +2,26 @@ class LoxInstance(
     private val klass: LoxClass
 ) {
 
-    private val fields: Map<String, Any> = HashMap()
+    private val fields: HashMap<String, Any?> = HashMap()
 
     override fun toString(): String {
         return "${klass.name} instance"
     }
 
     fun get(name: Token): Any {
-        return fields[name.lexeme] ?: throw RuntimeError(name, "Undefined property '${name.lexeme}'.")
+        val field = fields[name.lexeme]
+        if (field != null) {
+            return field
+        }
+
+        val method = klass.findMethod(name.lexeme)
+        if (method != null) {
+            return method
+        }
+        throw RuntimeError(name, "Undefined property '${name.lexeme}'.")
+    }
+
+    fun set(name: Token, value: Any?) {
+        fields[name.lexeme] = value
     }
 }

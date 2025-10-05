@@ -244,6 +244,13 @@ class Parser(
             if (expr is Expr.Variable) {
                 val name: Token = expr.name
                 return Expr.Assign(name, value)
+            } else if (expr is Expr.Get) {
+                val get: Expr.Get = expr
+                return Expr.Set(
+                    instance = get.instance,
+                    name = get.name,
+                    value = value
+                )
             }
 
             error(equals, "Invalid assignment in expression.")
