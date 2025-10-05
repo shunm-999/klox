@@ -1,4 +1,4 @@
-data class Token(
+class Token(
     val type: TokenType,
     val lexeme: String,
     val literal: Any?,
