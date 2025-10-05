@@ -149,6 +149,15 @@ class Interpreter :
         return callee.call(this, arguments)
     }
 
+    override fun visitGetExpr(expr: Expr.Get): Any {
+        val instance = evaluate(expr.instance)
+        if (instance is LoxInstance) {
+            return instance.get(expr.name)
+        }
+
+        throw RuntimeError(expr.name, "Only instances ave properties")
+    }
+
     override fun visitGroupingExpr(expr: Expr.Grouping): Any? = evaluate(expr.expression)
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any? = expr.value
@@ -201,6 +210,14 @@ class Interpreter :
 
     override fun visitBlockStmt(stmt: Stmt.Block) {
         executeBlock(stmt.statements, Environment(environment))
+    }
+
+    override fun visitClassStmt(stmt: Stmt.Class) {
+        environment.define(stmt.name.lexeme, null)
+        val klass = LoxClass(
+            name = stmt.name.lexeme,
+        )
+        environment.assign(stmt.name, klass)
     }
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {

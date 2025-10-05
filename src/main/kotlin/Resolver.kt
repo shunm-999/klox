@@ -13,6 +13,11 @@ class Resolver(
         endScope()
     }
 
+    override fun visitClassStmt(stmt: Stmt.Class) {
+        declare(stmt.name)
+        define(stmt.name)
+    }
+
     override fun visitVarStmt(stmt: Stmt.Var) {
         declare(stmt.token)
         if (stmt.initializer != null) {
@@ -63,7 +68,7 @@ class Resolver(
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) {
-        if(currentFunction == FunctionType.NONE) {
+        if (currentFunction == FunctionType.NONE) {
             Lox.error(stmt.keyword, "Can't return from top-level code.")
         }
 
@@ -88,6 +93,10 @@ class Resolver(
         for (argument in expr.arguments) {
             resolve(argument)
         }
+    }
+
+    override fun visitGetExpr(expr: Expr.Get) {
+        resolve(expr.instance)
     }
 
     override fun visitGroupingExpr(expr: Expr.Grouping) {

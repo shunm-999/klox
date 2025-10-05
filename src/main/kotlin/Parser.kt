@@ -15,6 +15,9 @@ class Parser(
 
     private fun declaration(): Stmt? {
         try {
+            if (match(TokenType.CLASS)) {
+                return classDeclaration()
+            }
             if (match(TokenType.FUN)) {
                 return function("function")
             }
@@ -50,7 +53,25 @@ class Parser(
         return expressionStatement()
     }
 
-    private fun function(kind: String): Stmt {
+    private fun classDeclaration(): Stmt {
+        val name: Token = consume(TokenType.IDENTIFIER, "Expect class name.")
+        consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
+
+        val methods: List<Stmt.Function> = buildList {
+            while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+                add(function("method"))
+            }
+        }
+
+        consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
+
+        return Stmt.Class(
+            name = name,
+            methods = methods,
+        )
+    }
+
+    private fun function(kind: String): Stmt.Function {
         val name: Token = consume(TokenType.IDENTIFIER, "Expect $kind name")
         consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name.")
 
@@ -359,6 +380,9 @@ class Parser(
         while (true) {
             if (match(TokenType.LEFT_PAREN)) {
                 expr = finishCall(expr)
+            } else if (match(TokenType.DOT)) {
+                val name: Token = consume(TokenType.IDENTIFIER, "Expect property name after '.'.")
+                expr = Expr.Get(instance = expr, name)
             } else {
                 break
             }
