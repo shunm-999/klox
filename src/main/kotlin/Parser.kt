@@ -128,7 +128,7 @@ class Parser(
                 )
         }
         if (condition == null) {
-            condition = Expr.Literal(condition)
+            condition = Expr.Literal(true)
         }
         body = Stmt.While(condition, body)
 
