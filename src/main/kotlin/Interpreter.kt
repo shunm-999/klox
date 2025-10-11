@@ -233,7 +233,11 @@ class Interpreter :
 
         val methods: Map<String, LoxFunction> = buildMap {
             for (method in stmt.methods) {
-                val function = LoxFunction(method, environment)
+                val function = LoxFunction(
+                    declaration = method,
+                    closure = environment,
+                    isInitializer = stmt.name.lexeme == "init",
+                )
                 put(method.name.lexeme, function)
             }
         }
@@ -251,7 +255,7 @@ class Interpreter :
     }
 
     override fun visitFunctionStmt(stmt: Stmt.Function) {
-        val loxFunction = LoxFunction(stmt, environment)
+        val loxFunction = LoxFunction(declaration = stmt, closure = environment, isInitializer = false)
         environment.define(stmt.name.lexeme, loxFunction)
     }
 

@@ -7,7 +7,8 @@ class Resolver(
     enum class FunctionType {
         NONE,
         FUNCTION,
-        METHOD
+        METHOD,
+        INITIALIZER,
     }
 
     enum class ClassType {
@@ -37,7 +38,12 @@ class Resolver(
         scopes.peek()["this"] = true
 
         for (method in stmt.methods) {
-            resolveFunction(method, FunctionType.METHOD)
+            val type = if (method.name.lexeme == "init") {
+                FunctionType.INITIALIZER
+            } else {
+                FunctionType.METHOD
+            }
+            resolveFunction(method, type)
         }
         endScope()
 
@@ -99,6 +105,9 @@ class Resolver(
         }
 
         if (stmt.value != null) {
+            if (currentFunction == FunctionType.INITIALIZER) {
+                Lox.error(stmt.keyword, "Can't return a value from an initializer.")
+            }
             resolve(stmt.value)
         }
     }

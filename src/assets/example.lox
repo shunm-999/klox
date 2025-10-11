@@ -1,9 +1,12 @@
-class Bacon {
-  eat() {
-    print this.name;
-  }
+class Foo {
+    init() {
+        print this;
+    }
+
+    test() {
+        print "test";
+    }
 }
 
-var bacon = Bacon();
-bacon.name = "Bacon";
-bacon.eat(); // Prints "Crunch crunch crunch!".
+var foo = Foo();
+foo.test();
