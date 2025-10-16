@@ -19,6 +19,15 @@ class LoxClass(
     }
 
     fun findMethod(name: String): LoxFunction? {
-        return methods[name]
+        val method = methods[name]
+        if (method != null) {
+            return method
+        }
+
+        if (superclass != null) {
+            return superclass.findMethod(name)
+        }
+
+        return null
     }
 }
