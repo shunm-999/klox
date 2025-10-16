@@ -229,6 +229,18 @@ class Interpreter :
     }
 
     override fun visitClassStmt(stmt: Stmt.Class) {
+
+
+        val superclass: LoxClass? = if (stmt.superClass != null) {
+            val superclass = evaluate(stmt.superClass)
+            if (superclass !is LoxClass) {
+                throw RuntimeError(stmt.superClass.name, "SuperClass must be a LoxClass")
+            }
+            superclass
+        } else {
+            null
+        }
+
         environment.define(stmt.name.lexeme, null)
 
         val methods: Map<String, LoxFunction> = buildMap {
@@ -244,6 +256,7 @@ class Interpreter :
 
         val klass = LoxClass(
             name = stmt.name.lexeme,
+            superclass = superclass,
             methods = methods,
         )
 

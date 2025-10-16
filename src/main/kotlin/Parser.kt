@@ -55,6 +55,14 @@ class Parser(
 
     private fun classDeclaration(): Stmt {
         val name: Token = consume(TokenType.IDENTIFIER, "Expect class name.")
+
+        val superClass: Expr.Variable? = if (match(TokenType.LESS)) {
+            consume(TokenType.IDENTIFIER, "Expect superclass name.")
+            Expr.Variable(previous())
+        } else {
+            null
+        }
+
         consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
 
         val methods: List<Stmt.Function> = buildList {
@@ -67,6 +75,7 @@ class Parser(
 
         return Stmt.Class(
             name = name,
+            superClass = superClass,
             methods = methods,
         )
     }

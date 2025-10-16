@@ -1,5 +1,6 @@
 class LoxClass(
     val name: String,
+    val superclass: LoxClass?,
     val methods: Map<String, LoxFunction>,
 ) : LoxCallable {
     override fun toString(): String = name
