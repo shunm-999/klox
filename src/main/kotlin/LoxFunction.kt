@@ -1,9 +1,8 @@
 class LoxFunction(
     private val declaration: Stmt.Function,
     private val closure: Environment,
-    private val isInitializer: Boolean
+    private val isInitializer: Boolean,
 ) : LoxCallable {
-
     override fun arity(): Int = declaration.params.size
 
     override fun call(
@@ -22,12 +21,13 @@ class LoxFunction(
         }
         if (isInitializer) {
             return closure.getAt(
-                0, Token(
+                0,
+                Token(
                     type = TokenType.IDENTIFIER,
                     lexeme = "this",
                     literal = null,
-                    line = 1
-                )
+                    line = 1,
+                ),
             )
         }
         return null
@@ -39,7 +39,7 @@ class LoxFunction(
         return LoxFunction(
             declaration = declaration,
             closure = environment,
-            isInitializer = isInitializer
+            isInitializer = isInitializer,
         )
     }
 

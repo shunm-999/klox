@@ -193,35 +193,38 @@ class Interpreter :
     override fun visitSuperExpr(expr: Expr.Super): Any? {
         val distance = locals.get(expr) ?: return null
 
-        val superclass = environment.getAt(
-            distance, Token(
-                type = TokenType.IDENTIFIER,
-                lexeme = "super",
-                literal = null,
-                line = 1
-            )
-        ) as LoxClass
+        val superclass =
+            environment.getAt(
+                distance,
+                Token(
+                    type = TokenType.IDENTIFIER,
+                    lexeme = "super",
+                    literal = null,
+                    line = 1,
+                ),
+            ) as LoxClass
 
-        val instance: LoxInstance = environment.getAt(
-            distance - 1, Token(
-                type = TokenType.IDENTIFIER,
-                lexeme = "this",
-                literal = null,
-                line = 1
-            )
-        ) as LoxInstance
+        val instance: LoxInstance =
+            environment.getAt(
+                distance - 1,
+                Token(
+                    type = TokenType.IDENTIFIER,
+                    lexeme = "this",
+                    literal = null,
+                    line = 1,
+                ),
+            ) as LoxInstance
 
-        val method: LoxFunction = superclass.findMethod(expr.method.lexeme) ?: throw RuntimeError(
-            expr.method,
-            "Undefined property '${expr.method.lexeme}'."
-        )
+        val method: LoxFunction =
+            superclass.findMethod(expr.method.lexeme) ?: throw RuntimeError(
+                expr.method,
+                "Undefined property '${expr.method.lexeme}'.",
+            )
 
         return method.bind(instance)
     }
 
-    override fun visitThisExpr(expr: Expr.This): Any? {
-        return lookUpVariable(expr.keyword, expr)
-    }
+    override fun visitThisExpr(expr: Expr.This): Any? = lookUpVariable(expr.keyword, expr)
 
     override fun visitUnaryExpr(expr: Expr.Unary): Any {
         val right = evaluate(expr.right)
@@ -243,7 +246,10 @@ class Interpreter :
 
     override fun visitVariableExpr(expr: Expr.Variable): Any? = lookUpVariable(expr.name, expr)
 
-    private fun lookUpVariable(name: Token, expr: Expr): Any? {
+    private fun lookUpVariable(
+        name: Token,
+        expr: Expr,
+    ): Any? {
         val distance = locals[expr]
 
         return if (distance != null) {
@@ -258,16 +264,16 @@ class Interpreter :
     }
 
     override fun visitClassStmt(stmt: Stmt.Class) {
-
-        val superclass: LoxClass? = if (stmt.superClass != null) {
-            val superclass = evaluate(stmt.superClass)
-            if (superclass !is LoxClass) {
-                throw RuntimeError(stmt.superClass.name, "SuperClass must be a LoxClass")
+        val superclass: LoxClass? =
+            if (stmt.superClass != null) {
+                val superclass = evaluate(stmt.superClass)
+                if (superclass !is LoxClass) {
+                    throw RuntimeError(stmt.superClass.name, "SuperClass must be a LoxClass")
+                }
+                superclass
+            } else {
+                null
             }
-            superclass
-        } else {
-            null
-        }
 
         environment.define(stmt.name.lexeme, null)
 
@@ -276,22 +282,25 @@ class Interpreter :
             environment.define("super", superclass)
         }
 
-        val methods: Map<String, LoxFunction> = buildMap {
-            for (method in stmt.methods) {
-                val function = LoxFunction(
-                    declaration = method,
-                    closure = environment,
-                    isInitializer = stmt.name.lexeme == "init",
-                )
-                put(method.name.lexeme, function)
+        val methods: Map<String, LoxFunction> =
+            buildMap {
+                for (method in stmt.methods) {
+                    val function =
+                        LoxFunction(
+                            declaration = method,
+                            closure = environment,
+                            isInitializer = stmt.name.lexeme == "init",
+                        )
+                    put(method.name.lexeme, function)
+                }
             }
-        }
 
-        val klass = LoxClass(
-            name = stmt.name.lexeme,
-            superclass = superclass,
-            methods = methods,
-        )
+        val klass =
+            LoxClass(
+                name = stmt.name.lexeme,
+                superclass = superclass,
+                methods = methods,
+            )
 
         if (superclass != null) {
             val enclosing = environment.enclosing
@@ -359,7 +368,10 @@ class Interpreter :
         statement.accept(this)
     }
 
-    fun resolve(expr: Expr, depth: Int) {
+    fun resolve(
+        expr: Expr,
+        depth: Int,
+    ) {
         locals[expr] = depth
     }
 

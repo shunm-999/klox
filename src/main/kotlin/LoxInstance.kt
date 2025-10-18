@@ -1,12 +1,9 @@
 class LoxInstance(
-    private val klass: LoxClass
+    private val klass: LoxClass,
 ) {
-
     private val fields: HashMap<String, Any?> = HashMap()
 
-    override fun toString(): String {
-        return "${klass.name} instance"
-    }
+    override fun toString(): String = "${klass.name} instance"
 
     fun get(name: Token): Any {
         val field = fields[name.lexeme]
@@ -21,7 +18,10 @@ class LoxInstance(
         throw RuntimeError(name, "Undefined property '${name.lexeme}'.")
     }
 
-    fun set(name: Token, value: Any?) {
+    fun set(
+        name: Token,
+        value: Any?,
+    ) {
         fields[name.lexeme] = value
     }
 }

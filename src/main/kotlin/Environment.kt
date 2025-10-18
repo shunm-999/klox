@@ -25,7 +25,11 @@ data class Environment(
         }
     }
 
-    fun assignAt(distance: Int, name: Token, value: Any?) {
+    fun assignAt(
+        distance: Int,
+        name: Token,
+        value: Any?,
+    ) {
         ancestor(distance).values[name.lexeme] = value
     }
 
@@ -40,7 +44,10 @@ data class Environment(
         throw RuntimeError(name, "Undefined variable '${name.lexeme}'.")
     }
 
-    fun getAt(distance: Int, name: Token): Any? = ancestor(distance).values[name.lexeme]
+    fun getAt(
+        distance: Int,
+        name: Token,
+    ): Any? = ancestor(distance).values[name.lexeme]
 
     fun ancestor(distance: Int): Environment {
         var environment = this

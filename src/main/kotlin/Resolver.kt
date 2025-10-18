@@ -1,9 +1,9 @@
-import java.util.*
+import java.util.Stack
 
 class Resolver(
-    private val interpreter: Interpreter
-) : Expr.Visitor<Unit>, Stmt.Visitor<Unit> {
-
+    private val interpreter: Interpreter,
+) : Expr.Visitor<Unit>,
+    Stmt.Visitor<Unit> {
     enum class FunctionType {
         NONE,
         FUNCTION,
@@ -14,7 +14,7 @@ class Resolver(
     enum class ClassType {
         NONE,
         CLASS,
-        SUBCLASS
+        SUBCLASS,
     }
 
     private val scopes: Stack<HashMap<String, Boolean>> = Stack()
@@ -53,11 +53,12 @@ class Resolver(
         scopes.peek()["this"] = true
 
         for (method in stmt.methods) {
-            val type = if (method.name.lexeme == "init") {
-                FunctionType.INITIALIZER
-            } else {
-                FunctionType.METHOD
-            }
+            val type =
+                if (method.name.lexeme == "init") {
+                    FunctionType.INITIALIZER
+                } else {
+                    FunctionType.METHOD
+                }
             resolveFunction(method, type)
         }
         endScope()
@@ -83,7 +84,7 @@ class Resolver(
             if (definition != null && !definition) {
                 Lox.error(
                     expr.name,
-                    "Can't read local variable in its own initializer."
+                    "Can't read local variable in its own initializer.",
                 )
             }
         }
@@ -172,7 +173,6 @@ class Resolver(
     }
 
     override fun visitSuperExpr(expr: Expr.Super) {
-
         if (currentClass == ClassType.NONE) {
             Lox.error(expr.keyword, "Can't use 'super' outside of a class.")
         } else if (currentClass != ClassType.SUBCLASS) {
@@ -215,7 +215,10 @@ class Resolver(
         expr.accept(this)
     }
 
-    private fun resolveLocal(expr: Expr, name: Token) {
+    private fun resolveLocal(
+        expr: Expr,
+        name: Token,
+    ) {
         for (i in scopes.size - 1 downTo 0) {
             if (scopes[i].containsKey(name.lexeme)) {
                 interpreter.resolve(expr, scopes.size - 1 - i)
@@ -223,8 +226,10 @@ class Resolver(
         }
     }
 
-    private fun resolveFunction(function: Stmt.Function, type: FunctionType) {
-
+    private fun resolveFunction(
+        function: Stmt.Function,
+        type: FunctionType,
+    ) {
         val enclosingFunction = currentFunction
         currentFunction = type
 

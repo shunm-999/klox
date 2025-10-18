@@ -56,20 +56,22 @@ class Parser(
     private fun classDeclaration(): Stmt {
         val name: Token = consume(TokenType.IDENTIFIER, "Expect class name.")
 
-        val superClass: Expr.Variable? = if (match(TokenType.LESS)) {
-            consume(TokenType.IDENTIFIER, "Expect superclass name.")
-            Expr.Variable(previous())
-        } else {
-            null
-        }
+        val superClass: Expr.Variable? =
+            if (match(TokenType.LESS)) {
+                consume(TokenType.IDENTIFIER, "Expect superclass name.")
+                Expr.Variable(previous())
+            } else {
+                null
+            }
 
         consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
 
-        val methods: List<Stmt.Function> = buildList {
-            while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
-                add(function("method"))
+        val methods: List<Stmt.Function> =
+            buildList {
+                while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+                    add(function("method"))
+                }
             }
-        }
 
         consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.")
 
@@ -258,7 +260,7 @@ class Parser(
                 return Expr.Set(
                     instance = get.instance,
                     name = get.name,
-                    value = value
+                    value = value,
                 )
             }
 
