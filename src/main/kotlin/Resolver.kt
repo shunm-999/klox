@@ -13,7 +13,8 @@ class Resolver(
 
     enum class ClassType {
         NONE,
-        CLASS
+        CLASS,
+        SUBCLASS
     }
 
     private val scopes: Stack<HashMap<String, Boolean>> = Stack()
@@ -39,6 +40,7 @@ class Resolver(
         }
 
         if (stmt.superClass != null) {
+            currentClass = ClassType.SUBCLASS
             resolve(stmt.superClass)
         }
 
@@ -170,6 +172,13 @@ class Resolver(
     }
 
     override fun visitSuperExpr(expr: Expr.Super) {
+
+        if (currentClass == ClassType.NONE) {
+            Lox.error(expr.keyword, "Can't use 'super' outside of a class.")
+        } else if (currentClass != ClassType.SUBCLASS) {
+            Lox.error(expr.keyword, "Can't use 'super' in a class with no superclass.")
+        }
+
         resolveLocal(expr, expr.keyword)
     }
 
