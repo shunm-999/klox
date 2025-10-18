@@ -421,6 +421,15 @@ class Parser(
         if (match(TokenType.NUMBER, TokenType.STRING)) {
             return Expr.Literal(previous().literal)
         }
+        if (match(TokenType.SUPER)) {
+            val keyword: Token = previous()
+            consume(TokenType.DOT, "Expect '.' after 'super'")
+            val method: Token = consume(TokenType.IDENTIFIER, "Expect superclass method name.")
+            return Expr.Super(
+                keyword = keyword,
+                method = method,
+            )
+        }
         if (match(TokenType.THIS)) {
             return Expr.This(previous())
         }

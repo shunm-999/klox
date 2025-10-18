@@ -1,5 +1,5 @@
 data class Environment(
-    private val enclosing: Environment? = null,
+    val enclosing: Environment? = null,
 ) {
     private val values: HashMap<String, Any?> = hashMapOf()
 

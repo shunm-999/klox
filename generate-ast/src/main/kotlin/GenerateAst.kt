@@ -47,6 +47,7 @@ object GenerateAst {
                     "Literal  : val value: Any?",
                     "Logical  : val left: Expr, val operator: Token, val right: Expr",
                     "Set      : val instance: Expr, val name: Token, val value: Expr",
+                    "Super    : val keyword: Token, val method: Token",
                     "This     : val keyword: Token",
                     "Unary    : val operator: Token, val right: Expr",
                     "Variable : val name: Token",

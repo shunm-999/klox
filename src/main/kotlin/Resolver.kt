@@ -42,6 +42,11 @@ class Resolver(
             resolve(stmt.superClass)
         }
 
+        if (stmt.superClass != null) {
+            beginScope()
+            scopes.peek()["super"] = false
+        }
+
         beginScope()
         scopes.peek()["this"] = true
 
@@ -54,6 +59,10 @@ class Resolver(
             resolveFunction(method, type)
         }
         endScope()
+
+        if (stmt.superClass != null) {
+            endScope()
+        }
 
         currentClass = enclosingClass
     }
@@ -158,6 +167,10 @@ class Resolver(
     override fun visitSetExpr(expr: Expr.Set) {
         resolve(expr.value)
         resolve(expr.instance)
+    }
+
+    override fun visitSuperExpr(expr: Expr.Super) {
+        resolveLocal(expr, expr.keyword)
     }
 
     override fun visitThisExpr(expr: Expr.This) {

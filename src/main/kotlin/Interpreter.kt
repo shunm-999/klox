@@ -190,6 +190,35 @@ class Interpreter :
         return value
     }
 
+    override fun visitSuperExpr(expr: Expr.Super): Any? {
+        val distance = locals.get(expr) ?: return null
+
+        val superclass = environment.getAt(
+            distance, Token(
+                type = TokenType.IDENTIFIER,
+                lexeme = "super",
+                literal = null,
+                line = 1
+            )
+        ) as LoxClass
+
+        val instance: LoxInstance = environment.getAt(
+            distance - 1, Token(
+                type = TokenType.IDENTIFIER,
+                lexeme = "this",
+                literal = null,
+                line = 1
+            )
+        ) as LoxInstance
+
+        val method: LoxFunction = superclass.findMethod(expr.method.lexeme) ?: throw RuntimeError(
+            expr.method,
+            "Undefined property '${expr.method.lexeme}'."
+        )
+
+        return method.bind(instance)
+    }
+
     override fun visitThisExpr(expr: Expr.This): Any? {
         return lookUpVariable(expr.keyword, expr)
     }
@@ -230,7 +259,6 @@ class Interpreter :
 
     override fun visitClassStmt(stmt: Stmt.Class) {
 
-
         val superclass: LoxClass? = if (stmt.superClass != null) {
             val superclass = evaluate(stmt.superClass)
             if (superclass !is LoxClass) {
@@ -242,6 +270,11 @@ class Interpreter :
         }
 
         environment.define(stmt.name.lexeme, null)
+
+        if (stmt.superClass != null) {
+            environment = Environment(environment)
+            environment.define("super", superclass)
+        }
 
         val methods: Map<String, LoxFunction> = buildMap {
             for (method in stmt.methods) {
@@ -259,6 +292,13 @@ class Interpreter :
             superclass = superclass,
             methods = methods,
         )
+
+        if (superclass != null) {
+            val enclosing = environment.enclosing
+            if (enclosing != null) {
+                environment = enclosing
+            }
+        }
 
         environment.assign(stmt.name, klass)
     }
